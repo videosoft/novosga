@@ -121,6 +121,41 @@ $app->get('/servicos(/:unidade)', function($unidade = 0) use ($api) {
     echo json_encode($api->servicos($unidade));
 });
 
+/**
+ * Retorna todos os serviços master e subserviços habilitados por unidade
+ * 
+ * GET /servicos/1
+ * < 200
+ * [ 
+ *   { 
+ *     id: 1, 
+ *     sigla: "A",
+ *     nome: "Serviço 1",
+ *     local: "Guichê"
+ *   }
+ * ]
+ */
+$app->get('/servicos-todos/:unidade', function($unidade) use ($api) {
+    echo json_encode($api->servicosTodos($unidade));
+});
+
+/**
+ * Retorna os subserviços do serviço master informado
+ * 
+ * GET /subservicos/1/2
+ * < 200
+ * [ 
+ *   { 
+ *     id: 2, 
+ *     sigla: "A",
+ *     nome: "SubServiço 1",
+ *     local: "Guichê"
+ *   }
+ * ]
+ */
+$app->get('/subservicos/:unidade/:master', function($unidade = 0, $master = 0) use ($api) {
+    echo json_encode($api->subservicos($unidade, $master));
+});
 
 $app->get('/painel(/:unidade)', function($unidade = 0) use ($app, $api) {
     $servicos = $app->request()->get('servicos');

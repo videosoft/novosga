@@ -23,7 +23,7 @@ class UnidadeController extends ModuleController {
             $locais = $this->em()->getRepository('Novosga\Model\Local')->findAll();
             if (sizeof($locais)) {
                 $local = $locais[0];
-                // atualizando relacionamento entre unidade e servicos mestre
+                // atualizando relacionamento entre unidade e servicos/subservicos
                 $conn = $this->em()->getConnection();
                 $conn->executeUpdate("
                     INSERT INTO uni_serv 
@@ -33,7 +33,7 @@ class UnidadeController extends ModuleController {
                     FROM 
                         servicos 
                     WHERE 
-                        macro_id IS NULL AND
+                        /*macro_id IS NULL AND*/
                         id NOT IN (SELECT servico_id FROM uni_serv WHERE unidade_id = :unidade)
                 ", array('unidade' => $unidade->getId(), 'local' => $local->getId()));
                 // todos servicos da unidade

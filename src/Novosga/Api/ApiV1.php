@@ -60,7 +60,7 @@ class ApiV1 extends Api {
     }
     
     /**
-     * Retorna os serviços globais ou os serviços disponíveis na unidade informada
+     * Retorna os serviços globais ou os serviços master disponíveis na unidade informada
      * @param int $unidade
      * @return array
      */
@@ -86,12 +86,63 @@ class ApiV1 extends Api {
                     JOIN e.local l
                 WHERE
                     e.status = 1 AND
-                    e.unidade = :unidade
+                    e.unidade = :unidade AND
+                    s.mestre IS NULL
                 ORDER BY 
                     e.nome ASC
             ')->setParameter(':unidade', $unidade)
                 ->getResult();
         }
+    }
+	
+	/**
+     * Retorna os serviços globais ou os serviços master disponíveis na unidade informada
+     * @param int $unidade
+     * @return array
+     */
+    public function servicosTodos($unidade) {
+		// servicos da unidade
+		return $this->em->createQuery('
+			SELECT 
+				s.id, e.sigla, e.nome, l.nome as local
+			FROM
+				Novosga\Model\ServicoUnidade e
+				JOIN e.servico s
+				JOIN e.local l
+			WHERE
+				e.status = 1 AND
+				e.unidade = :unidade
+			ORDER BY 
+				e.nome ASC
+		')->setParameter(':unidade', $unidade)
+			->getResult();
+    }
+
+    /**
+     * Retorna os subserviços disponíveis no serviço master informado
+     * @param int $unidade
+     * @param int $master
+     * @return array
+     */
+    public function subservicos($unidade, $master) {
+		
+		return $this->em->createQuery('
+			SELECT 
+				s.id, e.sigla, e.nome, l.nome as local
+			FROM
+				Novosga\Model\ServicoUnidade e
+				JOIN e.servico s
+				JOIN s.mestre m
+				JOIN e.local l
+			WHERE
+				e.status = 1 AND
+				m.id = :master AND
+				e.unidade = :unidade
+			ORDER BY 
+				e.nome ASC
+		')->setParameter(':master', $master)
+		->setParameter(':unidade', $unidade)
+				->getResult();
     }
     
     /**
